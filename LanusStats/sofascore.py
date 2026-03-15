@@ -38,6 +38,10 @@ class SofaScore:
             'appearances',
             'started',
             'saves',
+            'totalSaves',
+            'savedShots',
+            'savesFromInsideBox',
+            'savesFromOutsideBox',
             'cleanSheets',
             'savedShotsFromInsideTheBox',
             'savedShotsFromOutsideTheBox',
@@ -106,7 +110,11 @@ class SofaScore:
         user_agent = fake.chrome()
 
         chrome_options.add_argument(f'user-agent={user_agent}')
-        driver = uc.Chrome(options=chrome_options)
+        try:
+            driver = uc.Chrome(options=chrome_options)
+        except OSError:
+            # Fallback for WinError 6 issues locally
+            driver = uc.Chrome()
 
         try:
             driver.get(path)
@@ -247,6 +255,7 @@ class SofaScore:
             new_df = pd.DataFrame(data['results'])
             new_df['player'] = new_df.player.apply(pd.Series)['name']
             new_df['team'] = new_df.team.apply(pd.Series)['name']
+            print(f"DEBUG keys in results: {list(data['results'][0].keys())}")
             df = pd.concat([df, new_df])
             
             if data.get('page') == data.get('pages'):
@@ -258,6 +267,12 @@ class SofaScore:
             df.to_csv(f'{league} {season} stats.csv')
             
         if not df.empty:
+            # Re-map potential "saves" column names if Sofascore changed it
+            if 'totalSaves' in df.columns and 'saves' not in df.columns:
+                df['saves'] = df['totalSaves']
+            elif 'savedShots' in df.columns and 'saves' not in df.columns:
+                df['saves'] = df['savedShots']
+                
             if 'accuratePasses' in df.columns and 'accuratePassesPercentage' in df.columns:
                 df['attemptedPasses'] = df.apply(
                     lambda row: round(row['accuratePasses'] / (row['accuratePassesPercentage'] / 100))
