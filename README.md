@@ -15,7 +15,18 @@ En caso de querer actualizarla a la versión más reciente:
 pip install --upgrade LanusStats
 ```
 
-La libreria consta de distintos módulos para sacar información de estas páginas:
+### 🆕 Beginner Setup Instructions (How to use the latest version)
+If you want to use the newest features added to this repository (like the Goalkeeper Saves, Attempted Passes, and H2H Match stats) directly from your computer before they are released to `pip`, follow these steps:
+
+1. **Open your Terminal (or Command Prompt)**.
+2. Navigate to your cloned folder using `cd path/to/LanusStats`.
+3. Install the package locally by running this command:
+```bash
+pip install -e .
+```
+4. Now, if you open a Python script or notebook, importing `LanusStats` will use your updated code!
+
+---La libreria consta de distintos módulos para sacar información de estas páginas:
 
 * [FBRef](https://fbref.com/en/)
 * [FotMob](https://www.fotmob.com/es)
@@ -221,6 +232,26 @@ scrape_league_stats(league="Argentina Liga Profesional", season="2024", save_csv
 **save_csv** si guardar el dataframe en un csv o no
 **accumulation** como pedir las estadísticas. Valores posibles: total, per90, perMatch
 **selected_positions** que grupo de jugadores traer. Valores posibles: ['Goalkeepers', 'Defenders', 'Midfielders', 'Forwards']
+
+> 📌 **NEW METRICS (Added by you!)**:
+> When using `scrape_league_stats`, the output automatically includes:
+> - **Goalkeeper Saves** (fixed the bug preventing them from appearing!)
+> - **attemptedPasses** (calculated automatically for you if accurate passes exist)
+> - **attemptedDribbles** (calculated automatically for you if successful dribbles exist)
+> *Note: Metrics like shots, shots on target, clearances, and key passes are already pulled by default for the positions that have them.*
+
+* Obtener los últimos partidos jugados por un equipo:
+```python
+get_team_last_matches(team_id=3221, n=5)
+```
+**team_id**: ID del equipo en Sofascore (ejemplo: River Plate es 3221).
+**n**: Cantidad de partidos que queres traer (por defecto 5).
+
+* Obtener historial (Head-to-Head) entre dos equipos de un partido:
+```python
+get_match_h2h("https://www.sofascore.com/arsenal-manchester-united/KR#id:11352532")
+```
+Esto te va a devolver una lista con los enfrentamientos previos entre esos dos equipos.
 
 ## [Transfermarkt](https://github.com/federicorabanos/LanusStats/blob/main/LanusStats/transfermarkt.py)
 
