@@ -239,6 +239,17 @@ scrape_league_stats(league="Argentina Liga Profesional", season="2024", save_csv
 > - **attemptedPasses** (calculated automatically for you if accurate passes exist)
 > - **attemptedDribbles** (calculated automatically for you if successful dribbles exist)
 > *Note: Metrics like shots, shots on target, clearances, and key passes are already pulled by default for the positions that have them.*
+>
+> **Example output showing the new Goalie Saves metric:**
+> ```python
+> df = sofascore.scrape_league_stats(league="Argentina Liga Profesional", season="2024", save_csv=False, accumulation="per90", selected_positions= ["Goalkeepers"])
+> print(df[['player', 'saves', 'attemptedPasses']].head())
+>
+> # EX:
+> #                   player  saves  attemptedPasses
+> # 0  Franco Armani             3.2             25.0
+> # 1  Sergio Romero             2.8             18.0
+> ```
 
 * Obtener los últimos partidos jugados por un equipo:
 ```python
