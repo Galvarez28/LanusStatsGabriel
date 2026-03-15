@@ -24,7 +24,7 @@ class SofaScore:
             'aerialDuelsWon',
             'aerialDuelsWonPercentage',
             'successfulDribbles',
-            'successfulDribblesPercentage'
+            'successfulDribblesPercentage',
             'tackles',
             'assists',
             'accuratePassesPercentage',
@@ -256,6 +256,18 @@ class SofaScore:
             
         if save_csv:
             df.to_csv(f'{league} {season} stats.csv')
+            
+        if not df.empty:
+            if 'accuratePasses' in df.columns and 'accuratePassesPercentage' in df.columns:
+                df['attemptedPasses'] = df.apply(
+                    lambda row: round(row['accuratePasses'] / (row['accuratePassesPercentage'] / 100))
+                    if pd.notnull(row.get('accuratePassesPercentage')) and row.get('accuratePassesPercentage') > 0 else (row.get('accuratePasses', 0)), axis=1
+                )
+            if 'successfulDribbles' in df.columns and 'successfulDribblesPercentage' in df.columns:
+                df['attemptedDribbles'] = df.apply(
+                    lambda row: round(row['successfulDribbles'] / (row['successfulDribblesPercentage'] / 100))
+                    if pd.notnull(row.get('successfulDribblesPercentage')) and row.get('successfulDribblesPercentage') > 0 else (row.get('successfulDribbles', 0)), axis=1
+                )
         
         return df
     
@@ -349,6 +361,39 @@ class SofaScore:
             dataframes[team] = df
             
         return dataframes['home'], dataframes['away']
+
+    def get_team_last_matches(self, team_id, n=5):
+        """Get the last n matches for a team.
+
+        Args:
+            team_id (int|str): Sofascore team ID.
+            n (int, optional): Number of matches to return. Defaults to 5.
+
+        Returns:
+            list: List of dictionaries with match data.
+        """
+        request_url = f'api/v1/team/{team_id}/events/last/0'
+        data = self.sofascore_request(request_url)
+        events = data.get('events', [])
+        return events[:n]
+
+    def get_match_h2h(self, match_url):
+        """Get H2H history between two teams for a given match.
+
+        Args:
+            match_url (str): Full link to a SofaScore match
+
+        Returns:
+            list: List of dictionaries with H2H match data.
+        """
+        match_id = self.get_match_id(match_url)
+        request_url = f'api/v1/event/{match_id}/h2h/events'
+        try:
+            data = self.sofascore_request(request_url)
+            return data.get('events', [])
+        except Exception as e:
+            print(f"Error fetching H2H for match {match_id}: {e}")
+            return []
     
     ############################################################################
     
