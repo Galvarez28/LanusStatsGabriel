@@ -92,47 +92,44 @@ class SofaScore:
     def sofascore_request(self, path):
         """Request used to SofaScore
 
-        Args:
-            path (str): Part of the url to make the request
+        def sofascore_request(self, path):
+    """Request used to SofaScore"""
 
-        Returns:
-            data: _description_
-        """
+    path = f"{self.base_url}{path}"
+    fake = Faker()
+    user_agent = fake.chrome()
 
-        path = f"{self.base_url}{path}"
+    def make_driver():
+        # Always create a FRESH ChromeOptions object
+        opts = uc.ChromeOptions()
+        opts.add_argument("--headless=new")
+        opts.add_argument("--no-sandbox")
+        opts.add_argument("--disable-dev-shm-usage")
+        opts.add_argument("--disable-gpu")
+        opts.add_argument("--window-size=1920,1080")
+        opts.add_argument(f"user-agent={user_agent}")
+        return opts
 
-        chrome_options = uc.ChromeOptions()
-        chrome_options.add_argument("--headless=new")
-        chrome_options.add_argument("--no-sandbox")
-        chrome_options.add_argument("--disable-dev-shm-usage")
-        fake = Faker()
-
-        user_agent = fake.chrome()
-
-        chrome_options.add_argument(f'user-agent={user_agent}')
+    try:
+        driver = uc.Chrome(options=make_driver(), version_main=145)
+    except Exception:
         try:
-            # Force version 145 to match your current browser version
-            driver = uc.Chrome(options=chrome_options, version_main=145)
+            driver = uc.Chrome(options=make_driver())  # fresh options object
         except Exception:
-            try:
-                driver = uc.Chrome(options=chrome_options)
-            except OSError:
-                # Fallback for WinError 6 issues locally
-                driver = uc.Chrome()
+            driver = uc.Chrome(options=make_driver())  # fresh options object again
 
-        try:
-            driver.get(path)
-            time.sleep(3)
+    try:
+        driver.get(path)
+        time.sleep(3)
+        html = driver.page_source
+    finally:
+        driver.quit()
 
-            html = driver.page_source
+    soup = BeautifulSoup(html, 'html.parser')
+    data = json.loads(soup.text)
+    time.sleep(get_random_rate_sleep(1.5, 4))
+    return data
 
-        finally:
-            driver.quit()
-        
-        soup = BeautifulSoup(html, 'html.parser')
-        data = json.loads(soup.text)
-        time.sleep(get_random_rate_sleep(1.5, 4))
-        return data
 
     def get_match_data(self, match_url):
         """Gets all the general data from a match 
