@@ -36,6 +36,31 @@ If you are using **Google Colab**, you need to install the library and a headles
    %cd LanusStatsGabriel
    !pip install -e .
    ```
+   
+   ⚠️ **IMPORTANT: Fixing the "fatal: could not read Username" Error**
+   If you get an error that says `fatal: could not read Username for 'https://github.com': No such device or address`, it is because your GitHub repository is currently set to **Private**. Google Colab is like a brand new computer and doesn't know your password, so it gets blocked from downloading private code. 
+   
+   Here is how you fix it (**Choose Option A or Option B**):
+
+   **Option A: Make the Repository Public (Easiest)**
+   1. On GitHub, go to your LanusStatsGabriel repository page.
+   2. Click the **Settings** tab (the gear icon near the top right).
+   3. Scroll all the way down to the **Danger Zone** section.
+   4. Click **Change repository visibility** -> **Change to public**.
+   5. Try running the Colab cell again. It will now work automatically!
+
+   **Option B: Use a Secret Access Token (If you want to keep it Private)**
+   1. On GitHub, click your profile picture (top right) -> **Settings**.
+   2. Scroll down the left menu to the bottom and click **Developer settings**.
+   3. Click **Personal access tokens** -> **Tokens (classic)**.
+   4. Click **Generate new token (classic)**. Need a note? Call it "Colab". CHECK the box that says **repo** to give it access. Scroll down and click Generate.
+   5. Copy the long string of secret text it gives you.
+   6. In Colab, update your clone command to include your username and token like this:
+      ```bash
+      # Format:   https://USERNAME:TOKEN@github.com/USERNAME/REPO
+      !git clone https://Galvarez28:YOUR_SECRET_COPPIED_TOKEN@github.com/Galvarez28/LanusStatsGabriel.git
+      ```
+
 4. Now you can run the CLI commands using `!python scout_cli.py ...` (see examples below).
 
 ---
