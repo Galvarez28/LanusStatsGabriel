@@ -591,3 +591,76 @@ class SofaScore:
         url = f'api/v1/player/{player_id}/unique-tournament/{tournament_id}/season/{season_id}/statistics/overall'
         data = self.sofascore_request(url)
         return data.get('statistics', {})
+
+    def search_player(self, name):
+        """Search for a player by name to get their ID and details."""
+        import urllib.parse
+        encoded_name = urllib.parse.quote(name)
+        url = f'api/v1/search/all?q={encoded_name}'
+        data = self.sofascore_request(url)
+        players = [r for r in data.get('results', []) if r.get('type') == 'player']
+        if not players:
+            return None
+        return players[0]['entity']
+
+    def search_team(self, name):
+        """Search for a team by name to get their ID and details."""
+        import urllib.parse
+        encoded_name = urllib.parse.quote(name)
+        url = f'api/v1/search/all?q={encoded_name}'
+        data = self.sofascore_request(url)
+        teams = [r for r in data.get('results', []) if r.get('type') == 'team']
+        if not teams:
+            return None
+        return teams[0]['entity']
+
+    def get_current_season_id(self, tournament_id):
+        """Get the current season ID for a given tournament."""
+        url = f'api/v1/unique-tournament/{tournament_id}/seasons'
+        data = self.sofascore_request(url)
+        seasons = data.get('seasons', [])
+        if not seasons:
+            return None
+        return seasons[0]['id']
+
+    def get_player_h2h_history(self, player_id, team_id, opponent_team_id, n=5):
+        """Get the last N matches a player played against an opponent team."""
+        events = []
+        # Fetch last few pages of team matches to guarantee we find H2H
+        for page in range(4):
+            url = f'api/v1/team/{team_id}/events/last/{page}'
+            try:
+                data = self.sofascore_request(url)
+                page_events = data.get('events', [])
+                if not page_events:
+                    break
+                events.extend(page_events)
+            except Exception:
+                break
+                
+        # Filter for matchups against opponent
+        h2h_events = []
+        for event in events:
+            home_id = event.get('homeTeam', {}).get('id')
+            away_id = event.get('awayTeam', {}).get('id')
+            if opponent_team_id in (home_id, away_id):
+                h2h_events.append(event)
+                
+        # Fetch player stats for those events
+        history = []
+        for event in h2h_events[:n]:
+            event_id = event['id']
+            stats_url = f'api/v1/event/{event_id}/player/{player_id}/statistics'
+            try:
+                stats_data = self.sofascore_request(stats_url)
+                if 'statistics' in stats_data:
+                    history.append({
+                        'match_id': event_id,
+                        'match_slug': event.get('slug'),
+                        'timestamp': event.get('startTimestamp'),
+                        'statistics': stats_data.get('statistics', {})
+                    })
+            except:
+                continue
+        return history
+
