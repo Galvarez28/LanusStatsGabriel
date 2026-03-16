@@ -561,3 +561,33 @@ class SofaScore:
             raise PlayerDoesntHaveInfo(player_id)
 
         return season_heatmap
+
+    def get_player_match_history(self, player_id, tournament_id, season_id, n=10):
+        """Get the last n matches stats for a specific player in a season.
+        """
+        url = f'api/v1/player/{player_id}/unique-tournament/{tournament_id}/season/{season_id}/events'
+        data = self.sofascore_request(url)
+        events = data.get('events', [])
+        history = []
+        for event in events[:n]:
+            event_id = event['id']
+            stats_url = f'api/v1/event/{event_id}/player/{player_id}/statistics'
+            try:
+                stats_data = self.sofascore_request(stats_url)
+                if 'statistics' in stats_data:
+                    history.append({
+                        'match_id': event_id,
+                        'match_slug': event.get('slug'),
+                        'timestamp': event.get('startTimestamp'),
+                        'statistics': stats_data.get('statistics', {})
+                    })
+            except:
+                continue
+        return history
+
+    def get_player_season_stats_overall(self, player_id, tournament_id, season_id):
+        """Get the average stats for a player for the whole season.
+        """
+        url = f'api/v1/player/{player_id}/unique-tournament/{tournament_id}/season/{season_id}/statistics/overall'
+        data = self.sofascore_request(url)
+        return data.get('statistics', {})
