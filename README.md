@@ -67,6 +67,8 @@ If you are using **Google Colab**, you need to install the library and a headles
 
 ## 🔍 In-Depth Tutorial: Using `scout_cli.py`
 
+⚠️ **CRITICAL FOR GOOGLE COLAB USERS:** If you get a `SyntaxError: invalid syntax`, it means Colab thinks you are writing regular Python code instead of a terminal command. To fix this, **you MUST put an exclamation mark (`!`) at the very beginning of the command** (e.g., `!python scout_cli.py ...`).
+
 The new `scout_cli.py` script allows you to magically pull all of a player's relevant stats by just providing their name. No more hunting for Player IDs or Season IDs!
 
 ### The Required Parameters
@@ -79,9 +81,14 @@ The new `scout_cli.py` script allows you to magically pull all of a player's rel
 
 If you just want to know how a player has been performing lately, run the script with their name and the stat you are tracking.
 
-**Command:**
+**Command (PC / Regular Terminal):**
 ```bash
 python scout_cli.py "Lionel Messi" --stat "shots"
+```
+
+**Command (Google Colab):**
+```bash
+!python scout_cli.py "Lionel Messi" --stat "shots"
 ```
 
 **What it does:**
@@ -114,9 +121,14 @@ python scout_cli.py "Lionel Messi" --stat "shots"
 
 If a player is facing a specific team tonight, you want to know how he performed *against that exact team* in his past 5 matchups. Use the optional `--vs` parameter.
 
-**Command:**
+**Command (PC / Regular Terminal):**
 ```bash
 python scout_cli.py "Kevin De Bruyne" --stat "keyPasses" --vs "Arsenal"
+```
+
+**Command (Google Colab):**
+```bash
+!python scout_cli.py "Kevin De Bruyne" --stat "keyPasses" --vs "Arsenal"
 ```
 
 **What it does:**
@@ -148,9 +160,14 @@ python scout_cli.py "Kevin De Bruyne" --stat "keyPasses" --vs "Arsenal"
 
 You can track goalkeeper performance just like any other stat! 
 
-**Command:**
+**Command (PC / Regular Terminal):**
 ```bash
 python scout_cli.py "Emiliano Martinez" --stat "saves" --vs "Chelsea"
+```
+
+**Command (Google Colab):**
+```bash
+!python scout_cli.py "Emiliano Martinez" --stat "saves" --vs "Chelsea"
 ```
 
 ---
@@ -211,7 +228,15 @@ Here is an example of what the AI will generate when you feed it the data from `
 
 **Context:** Vinícius Júnior vs. Manchester City (UCL Round of 16 - 2nd Leg)
 
-**Step 1. Run the tools in your terminal:**
+**Step 1. Run the tools in your terminal (Remember to use `!` if you are in Google Colab):**
+
+*In Google Colab:*
+```bash
+!python scout_cli.py "Vinícius Júnior" --stat "shots"
+!python scout_cli.py "Vinícius Júnior" --stat "shots" --vs "Manchester City"
+```
+
+*In PC / Regular Terminal:*
 ```bash
 python scout_cli.py "Vinícius Júnior" --stat "shots"
 python scout_cli.py "Vinícius Júnior" --stat "shots" --vs "Manchester City"
