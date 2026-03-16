@@ -11,7 +11,9 @@ app = Flask(__name__)
 CORS(app) # Allow n8n to talk to this API
 sofa = SofaScore()
 
+@app.route('/', methods=['POST'])
 @app.route('/scout', methods=['POST'])
+@app.route('/analyze', methods=['POST'])
 def scout():
     data = request.json
     p_id = data.get('player_id')
