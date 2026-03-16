@@ -257,8 +257,15 @@ class SofaScore:
             data = self.sofascore_request(request_url)
             
             new_df = pd.DataFrame(data['results'])
-            new_df['player'] = new_df.player.apply(pd.Series)['name']
-            new_df['team'] = new_df.team.apply(pd.Series)['name']
+            # Extract names and IDs
+            player_series = new_df.player.apply(pd.Series)
+            team_series = new_df.team.apply(pd.Series)
+            
+            new_df['player'] = player_series['name']
+            new_df['player_id'] = player_series['id']
+            new_df['team'] = team_series['name']
+            new_df['team_id'] = team_series['id']
+            
             df = pd.concat([df, new_df])
             
             if data.get('page') == data.get('pages'):
