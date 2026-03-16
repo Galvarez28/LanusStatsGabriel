@@ -111,10 +111,14 @@ class SofaScore:
 
         chrome_options.add_argument(f'user-agent={user_agent}')
         try:
-            driver = uc.Chrome(options=chrome_options)
-        except OSError:
-            # Fallback for WinError 6 issues locally
-            driver = uc.Chrome()
+            # Force version 145 to match your current browser version
+            driver = uc.Chrome(options=chrome_options, version_main=145)
+        except Exception:
+            try:
+                driver = uc.Chrome(options=chrome_options)
+            except OSError:
+                # Fallback for WinError 6 issues locally
+                driver = uc.Chrome()
 
         try:
             driver.get(path)
@@ -255,7 +259,6 @@ class SofaScore:
             new_df = pd.DataFrame(data['results'])
             new_df['player'] = new_df.player.apply(pd.Series)['name']
             new_df['team'] = new_df.team.apply(pd.Series)['name']
-            print(f"DEBUG keys in results: {list(data['results'][0].keys())}")
             df = pd.concat([df, new_df])
             
             if data.get('page') == data.get('pages'):
